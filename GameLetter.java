@@ -70,7 +70,22 @@ public class GameLetter extends Thread
 		    }
 		    catch (Exception e)
 		    {
-			break;          //Exit the while loop if unable to find any id
+			try         //Try to search for the character id in characterFiles.java
+			{
+			    String line = input.readLine ();                                  //Read a line from the characterFiles document
+			    character = line.charAt (0);
+			    for (int v = 1 ; v < line.length () ; v++)              //Find the id of the character
+			    {
+				stringId += line.charAt (v);
+			    }
+			    int readId = Integer.parseInt (stringId);              //Read the character id. If the ID is the same as the class's ID, then break the loop.
+			    if (readId == id)
+				break;
+			}
+			catch (Exception d)
+			{
+			    break;          //Exit the while loop if unable to find any id
+			}
 		    }
 
 		}
@@ -135,14 +150,17 @@ public class GameLetter extends Thread
 		{
 		    input = new BufferedReader (new FileReader ("characterFiles.ans"));
 		    input.readLine ();
-		    while (true) //Read through characterFiles.ans for the rest of the characters
+		    while (true) //Read through characterFiles.ans for the rest of the characters. if it finds this specific id, do not allow it in the new string as it is being deleted
 			try
 			{
 			    line = input.readLine ();
 			    if (line == (null))
 				break;
-			    originalText += line;
-			    originalText += "/";        //Add a backslash so we can seperate each line
+			    if (!(Integer.parseInt (line.substring (1)) == id))
+			    {
+				originalText += line;
+				originalText += "/";        //Add a backslash so we can seperate each line
+			    }
 			}
 		    catch (Exception e)
 		    {
@@ -207,7 +225,7 @@ public class GameLetter extends Thread
 			originalText += input.readLine ();
 			originalText += "/";
 		    }
-		    originalText += "1";
+		    originalText += "1/";
 		    input.close ();
 		    output = new PrintWriter (new FileWriter ("gameFiles.ans"));
 		    for (int v = 0 ; v < originalText.length () ; v++)  //Iterate through each character in originalText
@@ -241,6 +259,7 @@ public class GameLetter extends Thread
 			c.setColor (new Color (42, 119, 119));
 			c.drawRect (0 + v, 386 + v, 500 - 2 * v, 114 - 2 * v);
 		    }
+		    break;
 		}
 	    }
 	    catch (Exception e)

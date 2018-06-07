@@ -42,6 +42,7 @@ import java.awt.*;
 import hsa.Console;
 import java.io.*;
 import hsa.Message;
+import java.util.*;
 
 public class AlphaAttackMAXIMUM
 {
@@ -49,6 +50,8 @@ public class AlphaAttackMAXIMUM
     static char menuChoice = 1;
     static int destroyedChars;
     static int errors;
+    long time;
+    int score;
     boolean debugMode = true;
     /*
 	letterFall() : Calls on the class letterFall to create a falling letter and explosion animation. Uses the join method to have the main method wait until execution is done.
@@ -497,20 +500,56 @@ public class AlphaAttackMAXIMUM
 			      String originalText, the text to write, consolidated into a single string.
 			      String line, the line that input is currently reading through. Updated each time input reads through a line.
 			      PrintWriter output, the output used to write encoded text for various purposes.
+			      int reds, greens blues: ints to be used for colour selection.
     */
     public void game (int difficulty)
     {
 	BufferedReader input;
 	String originalText = "";
 	String line = "";
+	int reds = 255, greens = 255, blues = 255;
 	PrintWriter output;
 	try                                                                     //Use a try statement to create text to iterate through
 	{
 	    output = new PrintWriter (new FileWriter ("gameFiles.ans"));  //Write the game files (e.g text speed, background colour) based on the difficulty.
 	    output.println ("% Ansh Sharma - gameFiles.ans");
 	    output.println (22 - 7 * difficulty);
-	    output.println (255);
-	    output.println (255);
+	    switch (difficulty)         //Change background colour depending on difficulty.
+	    {
+		case 1:
+		    reds = 255;
+		    greens = 255;
+		    blues = 0;
+		    break;
+		case 2:
+		    reds = 0;
+		    greens = 255;
+		    blues = 255;
+		    break;
+		case 3:
+		    reds = 255;
+		    greens = 0;
+		    blues = 255;
+		    break;
+		case 4:
+		    reds = 255;
+		    greens = 193;
+		    blues = 0;
+		    break;
+		case 5:
+		    reds = 0;
+		    greens = 255;
+		    blues = 193;
+		    break;
+		case 6:
+		    reds = 193;
+		    greens = 0;
+		    blues = 255;
+		    break;
+	    }
+	    output.println (reds);
+	    output.println (greens);
+	    output.println (blues);
 	    output.println (0);
 	    output.println (0);
 	    output.close ();
@@ -520,9 +559,9 @@ public class AlphaAttackMAXIMUM
 		try
 		{
 		    line = input.readLine ();
-		    originalText += line;                                  //Create one string with all the characters, add this line to that string
 		    if (line == (null))
 			break;
+		    originalText += line;                                  //Create one string with all the characters, add this line to that string
 		}
 		catch (Exception e)
 		{
@@ -557,7 +596,12 @@ public class AlphaAttackMAXIMUM
 
 	for (int i = 0 ; i < 385 ; i++)                                 //Draw the background
 	{
-	    c.setColor (new Color (255 - i / 2, 255 - i / 2, 0));
+	    if (reds == 0)
+		c.setColor (new Color (0, greens - i / 2, blues - i / 2));
+	    else if (greens == 0)
+		c.setColor (new Color (reds - i / 2, 0, blues - i / 2));
+	    else if (blues == 0)
+		c.setColor (new Color (reds - i / 2, greens - i / 2, 0));
 	    c.drawLine (0, i, 640, i);
 	}
 	c.setColor (new Color (42, 119, 119));                      //Draw the bottom panel where text is displayed.
@@ -579,6 +623,7 @@ public class AlphaAttackMAXIMUM
 	int tick = 0;          //Define a counter to track each millisecond that passes in the game, not completely accurate,
 	//but that is fine as this is only for basic purposes. A more accurate tick will be used to calculate WPM
 	letterTracer ();        //Call letterTracer to begin tracking the letters typed.
+	time = (new Date ()).getTime ();        //Establish the number of milliseconds passed at the start of the game.
 	while (true)
 	{
 	    try
@@ -588,10 +633,23 @@ public class AlphaAttackMAXIMUM
 	    catch (Exception e)
 	    {
 	    }
-	    if (tick % 300 / difficulty == 0)
+	    if (tick % (300 / difficulty) == 0 && difficulty < 4)   //If the game is on one of the basic easy/medium/hard modes, make the game continue like normal.
 	    {
 		gameLetter (count);
 		count++;
+	    }
+	    if (tick % 200 == 0)            //Refresh background
+	    {
+		for (int i = 0 ; i < 385 ; i++)                                 //Draw the background
+		{
+		    if (reds == 0)
+			c.setColor (new Color (0, greens - i / 2, blues - i / 2));
+		    else if (greens == 0)
+			c.setColor (new Color (reds - i / 2, 0, blues - i / 2));
+		    else if (blues == 0)
+			c.setColor (new Color (reds - i / 2, greens - i / 2, 0));
+		    c.drawLine (0, i, 640, i);
+		}
 	    }
 	    if (tick % 10 == 0)
 	    {
@@ -600,7 +658,7 @@ public class AlphaAttackMAXIMUM
 		c.setFont (new Font ("Lucida Console", 0, 40));
 		try
 		{
-		    input = new BufferedReader (new FileReader ("CharacterFiles.ans"));
+		    input = new BufferedReader (new FileReader ("characterFiles.ans"));
 		    for (int i = 0 ; i < 12 ; i++)
 		    {
 			line = input.readLine ();
@@ -614,10 +672,15 @@ public class AlphaAttackMAXIMUM
 		    input = new BufferedReader (new FileReader ("stats.ans"));
 		    c.setFont (new Font ("Lucida Console", 0, 15));
 		    c.setColor (Color.lightGray);
-		    c.drawString (input.readLine (), 573, 460);
+		    destroyedChars = Integer.parseInt (input.readLine ());
+		    c.drawString ("" + destroyedChars, 573, 460);               //Calculate and print destroyed characters by the user
 		    c.setFont (new Font ("Lucida Console", 0, 15));
 		    c.setColor (Color.lightGray);
-		    c.drawString (input.readLine (), 573, 480);
+		    errors = Integer.parseInt (input.readLine ());
+		    c.drawString ("" + errors, 573, 480);                   //Calculate and print errors
+		    c.setFont (new Font ("Lucida Console", 0, 30));
+		    c.setColor (Color.lightGray);
+		    c.drawString ("" + Math.round(destroyedChars / 5.0 / (new Date ().getTime () - time) * 60000), 573, 430);       //Calculate and print wpm
 		    input.close ();
 		}
 		catch (Exception e)
@@ -645,7 +708,7 @@ public class AlphaAttackMAXIMUM
 			    originalText += input.readLine ();
 			    originalText += "/";
 			}
-			originalText += "0";
+			originalText += "0/";
 			input.close ();
 			output = new PrintWriter (new FileWriter ("gameFiles.ans"));
 			for (int v = 0 ; v < originalText.length () ; v++)  //Iterate through each character in originalText

@@ -35,8 +35,13 @@ public class LetterTracer extends Thread
 	    {
 		input = new BufferedReader (new FileReader ("characterFiles.ans"));           //Create a BufferedReader to search through the read file
 		line = input.readLine ();                                //Read the first string in the file
+		if (line.charAt (0) == '_')     //If the user typed a space, convert to underscore
+		{
+		    line = " ";
+		}
 		if (line.charAt (0) == charInput)       //An if statement for if the user typed the correct character. Updates statistics and characters that are left.
 		{
+		    originalText = "";
 		    while (true) //If the user typed the right character, then recreate the whole characterFiles.ans, but remove the character ID they just typed.
 			try
 			{
@@ -69,9 +74,32 @@ public class LetterTracer extends Thread
 		    charsDestroyed = Integer.parseInt (input.readLine ()) + 1;          //The first number is the number of characters destroyed. Adds 1 to that since the user typed the right character.
 		    errors = Integer.parseInt (input.readLine ());                      //The second number is the number of errors the user has made. Since the user typed right, that doesn't affect anything, so we copy and paste it.
 		    input.close ();
-		    output = new PrintWriter (new FileWriter ("stats.ans"));            //Create a PrintWriter to rewrite the stats but with an additional point in chars destroyed..
+		    output = new PrintWriter (new FileWriter ("stats.ans"));            //Create a PrintWriter to rewrite the stats but with an additional point in chars destroyed.
 		    output.println (charsDestroyed);    //print stats
 		    output.println (errors);
+		    output.close ();
+		    originalText = "";
+		    input = new BufferedReader (new FileReader ("gameFiles.ans"));    //Encode and recreate gameFiles.ans, but add a 1 at the 6th line to designate that a new letter must be printed.
+		    for (int v = 0 ; v < 5 ; v++)
+		    {
+			originalText += input.readLine ();
+			originalText += "/";
+		    }
+		    originalText += "1";
+		    input.close ();
+		    output = new PrintWriter (new FileWriter ("gameFiles.ans"));
+		    for (int v = 0 ; v < originalText.length () ; v++)  //Iterate through each character in originalText
+		    {
+			switch (originalText.charAt (v))
+			{
+			    case '/':                                       //If the loop finds a backslash, print a new line
+				output.println ();
+				break;
+			    default:                                        //Otherwise, print the character that is in the text.
+				output.print (originalText.charAt (v));
+
+			}
+		    }
 		    output.close ();
 
 		}
@@ -86,6 +114,24 @@ public class LetterTracer extends Thread
 		    output.println (charsDestroyed);    //print stats
 		    output.println (errors);
 		    output.close ();
+
+		    for (int i = 0 ; i < 5 ; i++)           //Display a graphical red box to represent the error
+		    {
+			c.setColor (Color.red);
+			c.drawRect (0 + i, 386 + i, 500 - 2 * i, 114 - 2 * i);
+		    }
+		    try
+		    {
+			Thread.sleep (100);
+		    }
+		    catch (Exception e)
+		    {
+		    }
+		    for (int i = 0 ; i < 5 ; i++)           //Display a graphical red box to represent the error
+		    {
+			c.setColor (new Color (42, 119, 119));
+			c.drawRect (0 + i, 386 + i, 500 - 2 * i, 114 - 2 * i);
+		    }
 		}
 
 	    }

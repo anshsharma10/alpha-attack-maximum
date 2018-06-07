@@ -645,7 +645,7 @@ public class AlphaAttackMAXIMUM
 			    originalText += input.readLine ();
 			    originalText += "/";
 			}
-			originalText += "1";
+			originalText += "0";
 			input.close ();
 			output = new PrintWriter (new FileWriter ("gameFiles.ans"));
 			for (int v = 0 ; v < originalText.length () ; v++)  //Iterate through each character in originalText

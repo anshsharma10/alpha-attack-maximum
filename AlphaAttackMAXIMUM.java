@@ -310,12 +310,33 @@ public class AlphaAttackMAXIMUM
     {
 	c.setColor (Color.black);
 	c.fillRect (0, 0, 640, 500);
-	for (int i = 0 ; i < 500 ; i++)
+	c.setFont (new Font ("Arial", Font.BOLD, 100));
+	c.setColor (Color.white);
+	c.drawString ("Instructions", 25, 280);
+	try
 	{
-	    c.setColor (Color.lightGray);
-	    c.setFont (new Font ("Arial", Font.BOLD, 120 - i));
-	    c.drawString ("Instructions", 20 + i * 14 / 5, 280);
+	    Thread.sleep (1000);
 	}
+	catch (Exception e)
+	{
+	}
+	c.setColor (Color.black);
+	c.fillRect (0, 0, 640, 500);
+	c.setColor (Color.white);
+	c.setFont (new Font ("Arial", Font.BOLD, 20));
+	c.drawString ("Welcome to Alpha Attack Maximum.", 0, 20);
+	c.drawString ("Your goal is to complete the text by typing as much as possible.", 0, 40);
+	c.drawString ("Letters will fall down from the screen. You can see the next", 0, 60);
+	c.drawString ("letter on the bottom panel, as well as your WPM average.", 0, 80);
+	c.drawString ("There are 6 difficulties: Easy, Medium and Hard,", 0, 100);
+	c.drawString ("Time attack, which will create a long paragraph to type", 0, 120);
+	c.drawString ("and exits once you make 100 errors,", 0, 140);
+	c.drawString ("Maximum, the most powerful difficulty,", 0, 160);
+	c.drawString ("And debug, which is the easiest mode.", 0, 180);
+	c.drawString ("You can select a mode from the main menu.", 0, 200);
+	c.drawString ("High scores also save and can be cleared from the main menu.", 0, 220);
+	c.drawString ("Press any key to exit.", 0, 240);
+	pauseProgram ();
     }
 
 
@@ -326,6 +347,32 @@ public class AlphaAttackMAXIMUM
     */
     public void goodbye ()
     {
+	c.setColor (new Color (50, 58, 113));
+	c.fillRect (0, 0, 416, 500);
+	c.setColor (new Color (55, 1, 92));
+	c.fillRect (416, 0, 10, 500);
+	c.setColor (new Color (94, 1, 156));
+	c.fillRect (426, 0, 214, 500);
+	c.setColor (Color.white);
+	c.fillStar (40, 219, 15, 15);
+	c.fillStar (84, 35, 15, 15);
+	c.fillStar (188, 232, 15, 15);
+	c.fillStar (112, 394, 15, 15);
+	c.fillStar (341, 451, 15, 15);
+	c.fillStar (371, 198, 15, 15);
+	c.setFont (new Font ("Arial", 0, 60));
+	c.drawString ("YOUR", 438, 123);
+	c.drawString ("END", 438, 183);
+	c.drawString ("IS", 438, 243);
+	c.drawString ("NOT", 438, 303);
+	c.drawString ("OVER", 438, 363);
+	for (int i = 0 ; i < 80 ; i++)
+	{
+	    c.setColor (new Color (200 - i * 2, 200 - i * 2, 200 - i * 2));
+	    c.drawOval (300 + i, 50 + i, 80 - i*2, 80 - i*2);
+	}
+	pauseProgram ();
+	c.close();
     }
 
 
@@ -339,36 +386,6 @@ public class AlphaAttackMAXIMUM
     {
 	BufferedReader input;
 	String line;
-	for (int i = 0 ; i < 25 ; i += 2)                       //Animate the opening
-	{
-	    for (int v = 0 ; v < 32 ; v += 2)
-	    {
-		c.setColor (Color.black);
-		c.fillRect (20 * v, 0 + i * 20, 20, 40);
-		try
-		{
-		    Thread.sleep (2);
-		}
-		catch (Exception e)
-		{
-		}
-	    }
-	}
-	for (int i = 0 ; i < 25 ; i += 2)
-	{
-	    for (int v = 0 ; v < 32 ; v += 2)
-	    {
-		c.setColor (Color.black);
-		c.fillRect (20 + 20 * v, 0 + i * 20, 20, 40);
-		try
-		{
-		    Thread.sleep (2);
-		}
-		catch (Exception e)
-		{
-		}
-	    }
-	}
 	c.setColor (new Color (137, 135, 161));
 	c.fillRect (0, 0, 640, 94);
 	c.setColor (new Color (87, 84, 114));
@@ -397,6 +414,9 @@ public class AlphaAttackMAXIMUM
 
 			switch (line.charAt (v + 1))
 			{
+			    case '0':
+				c.drawString ("None", 500, 140 + i * 30);
+				break;
 			    case '1':
 				c.drawString ("Easy", 500, 140 + i * 30);
 				break;
@@ -424,16 +444,50 @@ public class AlphaAttackMAXIMUM
 	catch (Exception e)
 	{
 	}
+	c.setFont (new Font ("Arial", Font.BOLD, 30));
+	c.drawString ("Please type e to exit or c to clear scores.", 40, 480);
+	menuChoice = c.getChar ();
     }
 
 
     /*
 	clearScores() : Asks the user if they are sure they want to clear scores, then clears the scores.
 	Global variables used: none
-	Local variables used: none
+	Local variables used: PrintWriter output, a printwriter used to clear scores
     */
     public void clearScores ()
     {
+	PrintWriter output;
+	c.setColor (new Color (133, 129, 169));
+	c.fillRect (0, 100, 640, 400);
+	c.setFont (new Font ("Arial", Font.BOLD, 30));
+	c.setColor (Color.white);
+	c.drawString ("Are you sure you want to clear? Type y/n", 20, 250);
+	menuChoice = ' ';
+	while (menuChoice != 'y' || menuChoice != 'n')
+	{
+	    menuChoice = c.getChar ();
+	    if (menuChoice == 'n')
+	    {
+		break;
+	    }
+	    else            //Ask the user if they are sure, then erase the high scores.
+	    {
+		try
+		{
+		    output = new PrintWriter (new FileWriter ("highScores.ans"));
+		    for (int i = 0 ; i < 10 ; i++)
+		    {
+			output.println ("none/0%0");
+		    }
+		    output.close ();
+		    break;
+		}
+		catch (Exception e)
+		{
+		}
+	    }
+	}
     }
 
 
@@ -1077,19 +1131,16 @@ public class AlphaAttackMAXIMUM
 	    score [1] = String.valueOf (((int) Math.round ((((double) errors / (double) (destroyedChars + errors)) * destroyedChars * WPM)))); //calculate score
 	}
 	c.drawString ("" + score [1], 410, 251);
-	Console d = new Console ();
 	try
 	{
 	    input = new BufferedReader (new FileReader ("highScores.ans"));            //Read highScores.java
 	    for (int i = 0 ; i < 10 ; i++)
 	    {
-		d.println (i);
 		line = input.readLine ();
 		for (int v = 0 ; v < line.length () ; v++)
 		{
 		    if (line.charAt (v) == '/')
 		    {
-			d.println (score [2]);
 			if (Integer.parseInt (line.substring (v + 3)) < Integer.parseInt (score [1]) && score [2].equals ("!"))     //Compare the score just earned with each possible high score to see if there is a higher score.
 			{
 			    localHighScores [i] [0] = score [0]; //Add the score and difficulty to localHighScores
@@ -1207,7 +1258,7 @@ public class AlphaAttackMAXIMUM
 	c = new Console ("Ansh Sharma - Alpha Attack MAXIMUM");
 	AlphaAttackMAXIMUM AlAt = new AlphaAttackMAXIMUM ();
 	//AlAt.splashScreen ();
-	while (menuChoice != 4)
+	while (menuChoice != '4')
 	{
 	    AlAt.mainMenu ();
 	    switch (menuChoice)

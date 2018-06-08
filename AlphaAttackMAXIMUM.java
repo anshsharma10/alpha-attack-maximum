@@ -501,6 +501,7 @@ public class AlphaAttackMAXIMUM
 			      String line, the line that input is currently reading through. Updated each time input reads through a line.
 			      PrintWriter output, the output used to write encoded text for various purposes.
 			      int reds, greens blues: ints to be used for colour selection.
+			      int randNum: A random number between 0 and 30 to be used when selecting text.
     */
     public void game (int difficulty)
     {
@@ -554,15 +555,35 @@ public class AlphaAttackMAXIMUM
 	    output.println (1);
 	    output.close ();
 	    input = new BufferedReader (new FileReader ("gameText.ans"));       //Read a line from gameText to copy into encoded characters in characterFiles. This encoded text will be used in the game.
-	    //
+	    // There are 30 possible texts for the player to type. If they picked time attack, they will have to type all 30. Otherwise one random text will be picked.
+	    Console d = new Console ();
+	    int randNum = (int) Math.round (20 * Math.random ());
+	    d.println (randNum);
 	    while (true)
 	    {
 		try
 		{
 		    line = input.readLine ();
+		    if (line.charAt (0) == '%') //Check for a % header
+		    {
+			if (Integer.parseInt (line.substring (1)) == randNum)      //Check if the random generated number matches this number
+			{
+			    d.println ("found");
+			    while (true)        //Import the entire text into originalText until another header is found
+			    {
+				line = input.readLine ();
+				if (line.charAt (0) == '%')
+				    break;
+				else
+				{
+				    originalText += line;   //Create one string with all the characters, add this line to that string
+				}
+			    }
+			    break;
+			}
+		    }
 		    if (line == (null))
 			break;
-		    originalText += line;                                  //Create one string with all the characters, add this line to that string
 		}
 		catch (Exception e)
 		{

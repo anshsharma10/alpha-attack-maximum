@@ -979,7 +979,7 @@ public class AlphaAttackMAXIMUM
 	BufferedReader input;
 	String line;
 	PrintWriter output;
-	score[2] = "1";
+	score [2] = "!";
 
 	for (int i = 0 ; i < 25 ; i += 2)                       //Animate the opening
 	{
@@ -1077,16 +1077,19 @@ public class AlphaAttackMAXIMUM
 	    score [1] = String.valueOf (((int) Math.round ((((double) errors / (double) (destroyedChars + errors)) * destroyedChars * WPM)))); //calculate score
 	}
 	c.drawString ("" + score [1], 410, 251);
+	Console d = new Console ();
 	try
 	{
 	    input = new BufferedReader (new FileReader ("highScores.ans"));            //Read highScores.java
 	    for (int i = 0 ; i < 10 ; i++)
 	    {
+		d.println (i);
 		line = input.readLine ();
 		for (int v = 0 ; v < line.length () ; v++)
 		{
 		    if (line.charAt (v) == '/')
 		    {
+			d.println (score [2]);
 			if (Integer.parseInt (line.substring (v + 3)) < Integer.parseInt (score [1]) && score [2].equals ("!"))     //Compare the score just earned with each possible high score to see if there is a higher score.
 			{
 			    localHighScores [i] [0] = score [0]; //Add the score and difficulty to localHighScores
@@ -1103,7 +1106,7 @@ public class AlphaAttackMAXIMUM
 				score [2] = c.readLine ();
 				for (int x = 0 ; x < score [2].length () ; x++)
 				{
-				    if (score [2].charAt (x) == '/' || score [2].charAt (x) == '&' || score [2].charAt (x) == '!')      //Errortrap
+				    if (score [2].charAt (x) == '/' || score [2].charAt (x) == '%' || score [2].charAt (x) == '!')      //Errortrap
 				    {
 					new Message ("Please enter a name without any special characters.");
 					break;
@@ -1114,26 +1117,28 @@ public class AlphaAttackMAXIMUM
 				    }
 				}
 			    }
-			    while (localHighScores [i] [2] != score [2]);
+			    while (!(localHighScores [i] [2] == score [2]));
+			    localHighScores [i + 1] [0] = String.valueOf (line.charAt (v + 1));     //Copy the previous high score down a level
+			    localHighScores [i + 1] [1] = line.substring (v + 3);
+			    localHighScores [i + 1] [2] = line.substring (0, v);
 			}
+			else if (score.equals ("!"))
+			{
+			    localHighScores [i] [0] = String.valueOf (line.charAt (v + 1));
+			    localHighScores [i] [1] = line.substring (v + 3);
+			    localHighScores [i] [2] = line.substring (0, v);
+			}
+			else
+			{
+			    localHighScores [i + 1] [0] = String.valueOf (line.charAt (v + 1));     //Copy the previous high score down a level
+			    localHighScores [i + 1] [1] = line.substring (v + 3);
+			    localHighScores [i + 1] [2] = line.substring (0, v);
+			}
+			break;
 
-			localHighScores [i + 1] [0] = String.valueOf (line.charAt (v + 1));     //Copy the previous high score down a level
-			localHighScores [i + 1] [1] = line.substring (v + 3);
-			localHighScores [i + 1] [2] = line.substring (0, v);
 		    }
-		    else if (score.equals ("!"))
-		    {
-			localHighScores [i] [0] = String.valueOf (line.charAt (v + 1));
-			localHighScores [i] [1] = line.substring (v + 3);
-			localHighScores [i] [2] = line.substring (0, v);
-		    }
-		    else
-		    {
-			localHighScores [i + 1] [0] = String.valueOf (line.charAt (v + 1));     //Copy the previous high score down a level
-			localHighScores [i + 1] [1] = line.substring (v + 3);
-			localHighScores [i + 1] [2] = line.substring (0, v);
-		    }
-		    break;
+
+
 		}
 	    }
 	    input.close ();

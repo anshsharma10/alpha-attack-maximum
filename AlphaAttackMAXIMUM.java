@@ -9,8 +9,9 @@ Name               Data Type                Description
 menuChoice         static char              The user's selected choice when moving through menu screens. Found from menuChoice, and both are used in conjunction. Errortrapped.
 destroyedChars     int                      Number of destroyed character boxes. Used in final score calcuation.
 errors             int                      Number of errors the user has made when typing
-score              int                      Total user's score. Found from: (# of errors / destroyedChars)*(destroyedChars)*(WPM), converted to int.
+score              [3]String                Total user's score. Found from: (# of errors / (destroyedChars + errors))*(destroyedChars)*(WPM), converted to String, as well as the difficulty and user's name.
 time               int                      Elapsed seconds, used to calculate WPM.
+WPM                int                      Words per minute average.
 debugMode          boolean                  Represents whether or not the user has entered debug mode.
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////// Method Dictionary
@@ -51,7 +52,8 @@ public class AlphaAttackMAXIMUM
     static int destroyedChars;
     static int errors;
     long time;
-    int score;
+    String[] score = new String [3];
+    int WPM;
     boolean debugMode = true;
     /*
 	letterFall() : Calls on the class letterFall to create a falling letter and explosion animation. Uses the join method to have the main method wait until execution is done.
@@ -330,10 +332,98 @@ public class AlphaAttackMAXIMUM
     /*
 	highScores() : Displays the top 10 high scores using file input stored in a seperate document.
 	Global variables used: none
-	Local variables used: none
+	Local variables used: BufferedReader input, used for reading the high scores
+			      String line, used for sorting through each line in input
     */
     public void highScores ()
     {
+	BufferedReader input;
+	String line;
+	for (int i = 0 ; i < 25 ; i += 2)                       //Animate the opening
+	{
+	    for (int v = 0 ; v < 32 ; v += 2)
+	    {
+		c.setColor (Color.black);
+		c.fillRect (20 * v, 0 + i * 20, 20, 40);
+		try
+		{
+		    Thread.sleep (2);
+		}
+		catch (Exception e)
+		{
+		}
+	    }
+	}
+	for (int i = 0 ; i < 25 ; i += 2)
+	{
+	    for (int v = 0 ; v < 32 ; v += 2)
+	    {
+		c.setColor (Color.black);
+		c.fillRect (20 + 20 * v, 0 + i * 20, 20, 40);
+		try
+		{
+		    Thread.sleep (2);
+		}
+		catch (Exception e)
+		{
+		}
+	    }
+	}
+	c.setColor (new Color (137, 135, 161));
+	c.fillRect (0, 0, 640, 94);
+	c.setColor (new Color (87, 84, 114));
+	c.fillRect (0, 94, 640, 6);
+	c.setColor (new Color (133, 129, 169));
+	c.fillRect (0, 100, 640, 400);
+	c.setColor (Color.white);
+	c.setFont (new Font ("Arial", Font.BOLD, 80));
+	c.drawString ("High Scores", 90, 77);
+	c.setFont (new Font ("Arial", Font.BOLD, 20));
+	try
+	{
+	    input = new BufferedReader (new FileReader ("highScores.ans"));
+	    for (int i = 0 ; i < 10 ; i++)
+	    {
+		line = input.readLine ();
+		for (int v = 0 ; v < line.length () ; v++)      //Print high scores from highScores.ans
+		{
+		    if (line.charAt (v) == '/')
+		    {
+			c.drawString ("Score:" + line.substring (v + 3), 25, 140 + i * 30);
+
+			c.drawString ("By " + line.substring (0, v), 225, 140 + i * 30);
+
+			c.drawString ("Difficulty:", 375, 140 + i * 30);
+
+			switch (line.charAt (v + 1))
+			{
+			    case '1':
+				c.drawString ("Easy", 500, 140 + i * 30);
+				break;
+			    case '2':
+				c.drawString ("Medium", 500, 140 + i * 30);
+				break;
+			    case '3':
+				c.drawString ("Hard", 500, 140 + i * 30);
+				break;
+			    case '4':
+				c.drawString ("Time Attack", 500, 140 + i * 30);
+				break;
+			    case '5':
+				c.drawString ("Maximum", 500, 140 + i * 30);
+				break;
+			    case '6':
+				c.drawString ("Debug", 500, 140 + i * 30);
+				break;
+			}
+
+		    }
+		}
+	    }
+	}
+	catch (Exception e)
+	{
+	}
     }
 
 
@@ -510,6 +600,9 @@ public class AlphaAttackMAXIMUM
 	String line = "";
 	int reds = 255, greens = 255, blues = 255;
 	PrintWriter output;
+	score [0] = "!";
+	score [1] = "!";
+	score [2] = "!";
 	try                                                                     //Use a try statement to create text to iterate through
 	{
 	    output = new PrintWriter (new FileWriter ("gameFiles.ans"));  //Write the game files (e.g text speed, background colour) based on the difficulty.
@@ -630,7 +723,7 @@ public class AlphaAttackMAXIMUM
 			    }
 			    break;
 			}
-			if (line == (null) || line.equals("%"))
+			if (line == (null) || line.equals ("%"))
 			    break;
 		    }
 		    catch (Exception e)
@@ -767,7 +860,8 @@ public class AlphaAttackMAXIMUM
 		    c.drawString ("" + errors, 573, 480);                   //Calculate and print errors
 		    c.setFont (new Font ("Lucida Console", 0, 30));
 		    c.setColor (Color.lightGray);
-		    c.drawString ("" + Math.round (destroyedChars / 5.0 / (new Date ().getTime () - time) * 60000), 573, 430);      //Calculate and print wpm
+		    WPM = ((int) Math.round (destroyedChars / 5.0 / (new Date ().getTime () - time) * 60000));
+		    c.drawString ("" + WPM, 573, 430);    //Calculate and print wpm
 		    input.close ();
 		    originalText = "";
 		    input = new BufferedReader (new FileReader ("characterFiles.ans"));           //Create a BufferedReader to search through the read file
@@ -864,8 +958,9 @@ public class AlphaAttackMAXIMUM
 		{
 		}
 	    }
-	    tick++;
+	    tick++;     //Increase the count
 	}
+	score [0] = String.valueOf (difficulty); //Track difficulty for scores
     }
 
 
@@ -873,10 +968,217 @@ public class AlphaAttackMAXIMUM
     /*
     gameOver () : Displays the game over screen and user scores, and saves a high score if possible. Asks the user for their name.
     Global variables used: none
-    Local variables used: none
+    Local variables used: String[][] localHighScores, an array to be used when copying down high scores.
+			  BufferedReader input, for reading highScores.ans
+			  String line; A string representing the current line when reading highScores.ans.
+			  PrintWriter output, for exporting localHighScores after updates.
     */
     public void gameOver (int destroyedChars, int errors)
     {
+	String[] [] localHighScores = new String [10] [3];
+	BufferedReader input;
+	String line;
+	PrintWriter output;
+	score[2] = "1";
+
+	for (int i = 0 ; i < 25 ; i += 2)                       //Animate the opening
+	{
+	    for (int v = 0 ; v < 32 ; v += 2)
+	    {
+		c.setColor (Color.black);
+		c.fillRect (20 * v, 0 + i * 20, 20, 40);
+		try
+		{
+		    Thread.sleep (2);
+		}
+		catch (Exception e)
+		{
+		}
+	    }
+	}
+	for (int i = 0 ; i < 25 ; i += 2)
+	{
+	    for (int v = 0 ; v < 32 ; v += 2)
+	    {
+		c.setColor (Color.black);
+		c.fillRect (20 + 20 * v, 0 + i * 20, 20, 40);
+		try
+		{
+		    Thread.sleep (2);
+		}
+		catch (Exception e)
+		{
+		}
+	    }
+	}
+
+	c.setColor (new Color (46, 23, 27));
+	c.fillRect (0, 0, 640, 140);
+	c.setColor (new Color (71, 32, 39));
+	c.fillRect (5, 5, 640, 130);
+	c.setColor (new Color (93, 49, 56));
+	c.fillRect (0, 140, 400, 500);
+	c.setColor (new Color (46, 23, 27));
+	c.fillRect (400, 140, 240, 360);
+	c.setColor (new Color (71, 32, 39));
+	c.fillRect (405, 145, 230, 350);
+	c.setColor (Color.white);
+	c.setFont (new Font ("Arial", Font.BOLD, 100));             //Display stats
+	c.drawString ("GAME OVER", 10, 111);
+	c.setFont (new Font ("Arial", 0, 20));
+	c.drawString ("CHARACTERS TYPED", 11, 211);
+	c.drawString ("MISTAKES MADE", 11, 311);
+	c.drawString ("WORDS PER MINUTE", 11, 411);
+	c.drawString ("SCORE", 411, 165);
+	c.setFont (new Font ("Arial", Font.BOLD, 60));
+	try
+	{
+	    Thread.sleep (800);
+	}
+	catch (Exception e)
+	{
+	}
+	c.drawString ("" + destroyedChars, 235, 211);
+	try
+	{
+	    Thread.sleep (800);
+	}
+	catch (Exception e)
+	{
+	}
+	c.drawString ("" + errors, 235, 311);
+	try
+	{
+	    Thread.sleep (800);
+	}
+	catch (Exception e)
+	{
+	}
+	c.drawString ("" + WPM, 235, 411);
+	try
+	{
+	    Thread.sleep (800);
+	}
+	catch (Exception e)
+	{
+	}
+	c.setFont (new Font ("Arial", Font.BOLD, 80));
+
+	if (errors == 0 && destroyedChars == 0)
+	{
+	    score [1] = ("0");
+	}
+	else if (errors == 0)
+	{
+	    score [1] = String.valueOf ((destroyedChars * WPM));
+	}
+	else
+	{
+	    score [1] = String.valueOf (((int) Math.round ((((double) errors / (double) (destroyedChars + errors)) * destroyedChars * WPM)))); //calculate score
+	}
+	c.drawString ("" + score [1], 410, 251);
+	try
+	{
+	    input = new BufferedReader (new FileReader ("highScores.ans"));            //Read highScores.java
+	    for (int i = 0 ; i < 10 ; i++)
+	    {
+		line = input.readLine ();
+		for (int v = 0 ; v < line.length () ; v++)
+		{
+		    if (line.charAt (v) == '/')
+		    {
+			if (Integer.parseInt (line.substring (v + 3)) < Integer.parseInt (score [1]) && score [2].equals ("!"))     //Compare the score just earned with each possible high score to see if there is a higher score.
+			{
+			    localHighScores [i] [0] = score [0]; //Add the score and difficulty to localHighScores
+			    localHighScores [i] [1] = score [1];
+			    c.setFont (new Font ("Arial", Font.BOLD, 20));
+			    c.drawString ("New High Score!", 410, 270);
+			    do
+			    {
+				c.setFont (new Font ("Arial", Font.BOLD, 16));        //Ask the user for their name
+				c.drawString ("Please enter your name:", 410, 290);
+				c.setTextBackgroundColor (new Color (71, 32, 39));
+				c.setTextColor (Color.white);
+				c.setCursor (17, 53);
+				score [2] = c.readLine ();
+				for (int x = 0 ; x < score [2].length () ; x++)
+				{
+				    if (score [2].charAt (x) == '/' || score [2].charAt (x) == '&' || score [2].charAt (x) == '!')      //Errortrap
+				    {
+					new Message ("Please enter a name without any special characters.");
+					break;
+				    }
+				    else if (x == score [2].length () - 1)
+				    {
+					localHighScores [i] [2] = score [2];
+				    }
+				}
+			    }
+			    while (localHighScores [i] [2] != score [2]);
+			}
+
+			localHighScores [i + 1] [0] = String.valueOf (line.charAt (v + 1));     //Copy the previous high score down a level
+			localHighScores [i + 1] [1] = line.substring (v + 3);
+			localHighScores [i + 1] [2] = line.substring (0, v);
+		    }
+		    else if (score.equals ("!"))
+		    {
+			localHighScores [i] [0] = String.valueOf (line.charAt (v + 1));
+			localHighScores [i] [1] = line.substring (v + 3);
+			localHighScores [i] [2] = line.substring (0, v);
+		    }
+		    else
+		    {
+			localHighScores [i + 1] [0] = String.valueOf (line.charAt (v + 1));     //Copy the previous high score down a level
+			localHighScores [i + 1] [1] = line.substring (v + 3);
+			localHighScores [i + 1] [2] = line.substring (0, v);
+		    }
+		    break;
+		}
+	    }
+	    input.close ();
+	}
+	catch (Exception e)
+	{
+	}
+
+
+
+
+
+
+	if (!(score [2].equals ("!")))          //Encrypt the high scores again and output them, but only if changes have been made
+	{
+	    try
+	    {
+		output = new PrintWriter (new FileWriter ("highScores.ans"));
+		for (int i = 0 ; i < 10 ; i++)
+		{
+		    output.println (localHighScores [i] [2] + "/" + localHighScores [i] [0] + "%" + localHighScores [i] [1]);
+		}
+		output.close ();
+	    }
+	    catch (Exception e)
+	    {
+	    }
+
+	}
+
+
+	try
+	{
+	    Thread.sleep (800);
+	}
+
+
+	catch (Exception e)
+	{
+	}
+
+
+	c.setFont (new Font ("Arial", Font.BOLD, 16));
+	c.drawString ("Press any key to exit", 410, 370);
+	pauseProgram ();
     }
 
 

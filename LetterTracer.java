@@ -30,7 +30,84 @@ public class LetterTracer extends Thread
 	PrintWriter output;
 	while (true)
 	{
-	    charInput = c.getChar ();
+	    try         //Check if the game is still able to run.
+	    {
+		input = new BufferedReader (new FileReader ("characterFiles.ans"));           //Create a BufferedReader to search through the read file
+		line = input.readLine ();                                //Read the first string in the file
+		if (line == (null))         //If there are no more character files, shut down the game.
+		{
+		    input.close ();
+		    originalText = "";
+		    input = new BufferedReader (new FileReader ("gameFiles.ans"));    //Encode and recreate gameFiles.ans, but add a 0 to the 7th line since we're shutting down the game.
+		    for (int v = 0 ; v < 6 ; v++)
+		    {
+			originalText += input.readLine ();
+			originalText += "/";
+		    }
+		    originalText += "0/";        //Add a 0 to signify shutting down the game.
+		    input.close ();
+		    output = new PrintWriter (new FileWriter ("gameFiles.ans"));
+		    for (int v = 0 ; v < originalText.length () ; v++)  //Iterate through each character in originalText
+		    {
+			switch (originalText.charAt (v))
+			{
+			    case '/':                                       //If the loop finds a backslash, print a new line
+				output.println ();
+				break;
+			    default:                                        //Otherwise, print the character that is in the text.
+				output.print (originalText.charAt (v));
+
+			}
+		    }
+		    output.close ();
+		    break;  //Break the while loop
+		}
+	    }
+	    catch (Exception e)
+	    {
+	    }
+	    charInput = c.getChar ();       //Receive user input
+	    if (charInput == '4')       //If the user inputs "420", then exit the game.
+	    {
+		charInput = c.getChar ();
+		if (charInput == '2')
+		{
+		    charInput = c.getChar ();
+		    if (charInput == '0')
+		    {
+			try
+			{
+			    originalText = "";
+			    input = new BufferedReader (new FileReader ("gameFiles.ans"));    //Encode and recreate gameFiles.ans, but add a 0 to the 7th line since we're shutting down the game.
+			    for (int v = 0 ; v < 6 ; v++)
+			    {
+				originalText += input.readLine ();
+				originalText += "/";
+			    }
+			    originalText += "0/";        //Add a 0 to signify shutting down the game.
+			    input.close ();
+			    output = new PrintWriter (new FileWriter ("gameFiles.ans"));
+			    for (int v = 0 ; v < originalText.length () ; v++)  //Iterate through each character in originalText
+			    {
+				switch (originalText.charAt (v))
+				{
+				    case '/':                                       //If the loop finds a backslash, print a new line
+					output.println ();
+					break;
+				    default:                                        //Otherwise, print the character that is in the text.
+					output.print (originalText.charAt (v));
+
+				}
+			    }
+			    output.close ();
+			    break;
+			}
+			catch (Exception e)
+			{
+			}
+		    }
+		}
+	    }
 	    try
 	    {
 		input = new BufferedReader (new FileReader ("characterFiles.ans"));           //Create a BufferedReader to search through the read file
@@ -85,8 +162,9 @@ public class LetterTracer extends Thread
 			originalText += input.readLine ();
 			originalText += "/";
 		    }
-		    originalText += "1";
+		    originalText += "1/1";
 		    input.close ();
+
 		    output = new PrintWriter (new FileWriter ("gameFiles.ans"));
 		    for (int v = 0 ; v < originalText.length () ; v++)  //Iterate through each character in originalText
 		    {

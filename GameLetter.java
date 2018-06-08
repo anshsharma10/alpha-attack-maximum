@@ -44,6 +44,22 @@ public class GameLetter extends Thread
 
 	for (int i = 1 ; i < 385 ; i++) //This for loop animates the letter falling down
 	{
+	    try     //First check if the game is still running.
+	    {
+		input = new BufferedReader (new FileReader ("gameFiles.ans"));          //Check if there is a 0 at the 7th line of gameFiles.ans, meaning that the game has stopped. Commence shutdown sequence.
+		for (int v = 0 ; v < 6 ; v++)
+		{
+		    input.readLine ();
+		}
+		if (input.readLine ().equals ("0"))
+		{
+		    input.close ();
+		    break;
+		}
+	    }
+	    catch (Exception e)
+	    {
+	    }
 	    try
 	    {
 		input = new BufferedReader (new FileReader ("gameFiles.ans"));
@@ -190,6 +206,43 @@ public class GameLetter extends Thread
 		    output.println (errors);
 		    output.close ();
 
+		    try         //Check if the game is still able to run.
+		    {
+			input = new BufferedReader (new FileReader ("characterFiles.ans"));           //Create a BufferedReader to search through the read file
+			line = input.readLine ();                                //Read the first string in the file
+			if (line == (null))         //If there are no more character files, shut down the game.
+			{
+			    input.close ();
+			    originalText = "";
+			    input = new BufferedReader (new FileReader ("gameFiles.ans"));    //Encode and recreate gameFiles.ans, but add a 0 to the 7th line since we're shutting down the game.
+			    for (int v = 0 ; v < 6 ; v++)
+			    {
+				originalText += input.readLine ();
+				originalText += "/";
+			    }
+			    originalText += "0/";        //Add a 0 to signify shutting down the game.
+			    input.close ();
+			    output = new PrintWriter (new FileWriter ("gameFiles.ans"));
+			    for (int v = 0 ; v < originalText.length () ; v++)  //Iterate through each character in originalText
+			    {
+				switch (originalText.charAt (v))
+				{
+				    case '/':                                       //If the loop finds a backslash, print a new line
+					output.println ();
+					break;
+				    default:                                        //Otherwise, print the character that is in the text.
+					output.print (originalText.charAt (v));
+
+				}
+			    }
+			    output.close ();
+			    break;  //Break the while loop
+			}
+		    }
+		    catch (Exception e)
+		    {
+		    }
+
 		    for (int v = 0 ; v < 6 ; v++)
 		    {
 			c.setColor (new Color (249 - 15 * v, 225 - 15 * v, 154 - 15 * v));                       //Draw the destroyed character
@@ -225,7 +278,7 @@ public class GameLetter extends Thread
 			originalText += input.readLine ();
 			originalText += "/";
 		    }
-		    originalText += "1/";
+		    originalText += "1/1";
 		    input.close ();
 		    output = new PrintWriter (new FileWriter ("gameFiles.ans"));
 		    for (int v = 0 ; v < originalText.length () ; v++)  //Iterate through each character in originalText

@@ -551,9 +551,10 @@ public class AlphaAttackMAXIMUM
 	    output.println (greens);
 	    output.println (blues);
 	    output.println (0);
-	    output.println (0);
+	    output.println (1);
 	    output.close ();
-	    input = new BufferedReader (new FileReader ("gameText.ans"));       //Read a line from gameText to copy into encoded characters in characterFiles. This encoded text will be used in teh game.
+	    input = new BufferedReader (new FileReader ("gameText.ans"));       //Read a line from gameText to copy into encoded characters in characterFiles. This encoded text will be used in the game.
+	    //
 	    while (true)
 	    {
 		try
@@ -588,6 +589,7 @@ public class AlphaAttackMAXIMUM
 	    output = new PrintWriter (new FileWriter ("stats.ans"));
 	    output.println ("0");   //Reset the stats to 0
 	    output.println ("0");
+	    output.println ("1");
 	    output.close ();
 	}
 	catch (Exception e)
@@ -680,7 +682,7 @@ public class AlphaAttackMAXIMUM
 		    c.drawString ("" + errors, 573, 480);                   //Calculate and print errors
 		    c.setFont (new Font ("Lucida Console", 0, 30));
 		    c.setColor (Color.lightGray);
-		    c.drawString ("" + Math.round(destroyedChars / 5.0 / (new Date ().getTime () - time) * 60000), 573, 430);       //Calculate and print wpm
+		    c.drawString ("" + Math.round (destroyedChars / 5.0 / (new Date ().getTime () - time) * 60000), 573, 430);      //Calculate and print wpm
 		    input.close ();
 		}
 		catch (Exception e)
@@ -689,6 +691,22 @@ public class AlphaAttackMAXIMUM
 	    }
 	    if (tick % 5 == 0)
 	    {
+		try
+		{
+		    input = new BufferedReader (new FileReader ("gameFiles.ans"));          //Check if there is a 0 at the 7th line of gameFiles.ans, meaning that the game has stopped. Commence shutdown sequence.
+		    for (int v = 0 ; v < 6 ; v++)
+		    {
+			input.readLine ();
+		    }
+		    if (input.readLine ().equals ("0"))
+		    {
+			input.close ();
+			break;
+		    }
+		}
+		catch (Exception e)
+		{
+		}
 		try
 		{
 		    input = new BufferedReader (new FileReader ("gameFiles.ans"));    //Check if there is a 1 at the 6th line of gameFiles.ans, meaning a GameLetter class has requested to create a new letter
@@ -709,6 +727,7 @@ public class AlphaAttackMAXIMUM
 			    originalText += "/";
 			}
 			originalText += "0/";
+			originalText += input.readLine ();
 			input.close ();
 			output = new PrintWriter (new FileWriter ("gameFiles.ans"));
 			for (int v = 0 ; v < originalText.length () ; v++)  //Iterate through each character in originalText

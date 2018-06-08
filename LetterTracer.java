@@ -217,7 +217,6 @@ public class LetterTracer extends Thread
 	    {
 	    }
 	}
-
     }
 
 

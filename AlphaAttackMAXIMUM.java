@@ -514,7 +514,27 @@ public class AlphaAttackMAXIMUM
 	{
 	    output = new PrintWriter (new FileWriter ("gameFiles.ans"));  //Write the game files (e.g text speed, background colour) based on the difficulty.
 	    output.println ("% Ansh Sharma - gameFiles.ans");
-	    output.println (22 - 7 * difficulty);
+	    switch (difficulty)         //Change text speed depending on difficulty.
+	    {
+		case 1:
+		    output.println (20);
+		    break;
+		case 2:
+		    output.println (14);
+		    break;
+		case 3:
+		    output.println (6);
+		    break;
+		case 4:
+		    output.println (10);
+		    break;
+		case 5:
+		    output.println (3);
+		    break;
+		case 6:
+		    output.println (30);
+		    break;
+	    }
 	    switch (difficulty)         //Change background colour depending on difficulty.
 	    {
 		case 1:
@@ -555,21 +575,50 @@ public class AlphaAttackMAXIMUM
 	    output.println (1);
 	    output.close ();
 	    input = new BufferedReader (new FileReader ("gameText.ans"));       //Read a line from gameText to copy into encoded characters in characterFiles. This encoded text will be used in the game.
-	    // There are 30 possible texts for the player to type. If they picked time attack, they will have to type all 30. Otherwise one random text will be picked.
-	    Console d = new Console ();
-	    int randNum = (int) Math.round (20 * Math.random ());
-	    d.println (randNum);
-	    while (true)
+	    // There are 30 possible texts for the player to type. One random text will be picked.
+	    if (difficulty != 4)
 	    {
-		try
+		int randNum = (int) Math.round (20 * Math.random ());
+		while (true)
 		{
-		    line = input.readLine ();
-		    if (line.charAt (0) == '%') //Check for a % header
+		    try
 		    {
-			if (Integer.parseInt (line.substring (1)) == randNum)      //Check if the random generated number matches this number
+			line = input.readLine ();
+			if (line.charAt (0) == '%') //Check for a % header
 			{
-			    d.println ("found");
-			    while (true)        //Import the entire text into originalText until another header is found
+			    if (Integer.parseInt (line.substring (1)) == randNum)      //Check if the random generated number matches this number
+			    {
+				while (true)        //Import the entire text into originalText
+				{
+				    line = input.readLine ();
+				    if (line.charAt (0) == '%')
+					break;
+				    else
+				    {
+					originalText += line;   //Create one string with all the characters, add this line to that string
+				    }
+				}
+				break;
+			    }
+			}
+			if (line == (null))
+			    break;
+		    }
+		    catch (Exception e)
+		    {
+		    }
+		}
+	    }
+	    else
+	    {
+		while (true)
+		{
+		    try
+		    {
+			line = input.readLine ();
+			if (line.equals ("%21")) //Check for a % header
+			{
+			    while (true)        //Import the entire text into originalText
 			    {
 				line = input.readLine ();
 				if (line.charAt (0) == '%')
@@ -581,12 +630,12 @@ public class AlphaAttackMAXIMUM
 			    }
 			    break;
 			}
+			if (line == (null) || line.equals("%"))
+			    break;
 		    }
-		    if (line == (null))
-			break;
-		}
-		catch (Exception e)
-		{
+		    catch (Exception e)
+		    {
+		    }
 		}
 	    }
 	    input.close ();
@@ -661,6 +710,21 @@ public class AlphaAttackMAXIMUM
 		gameLetter (count);
 		count++;
 	    }
+	    if (tick % 250 == 0 && difficulty == 4)        //If the mode is on time attack, set a custom timer
+	    {
+		gameLetter (count);
+		count++;
+	    }
+	    if (tick % 75 == 0 && difficulty == 5)        //If the mode is on maximum, set a custom timer (hardest possible)
+	    {
+		gameLetter (count);
+		count++;
+	    }
+	    if (tick % 400 == 0 && difficulty == 6)        //If the mode is on debug, set a custom timer (easiest possible)
+	    {
+		gameLetter (count);
+		count++;
+	    }
 	    if (tick % 200 == 0)            //Refresh background
 	    {
 		for (int i = 0 ; i < 385 ; i++)                                 //Draw the background
@@ -705,6 +769,36 @@ public class AlphaAttackMAXIMUM
 		    c.setColor (Color.lightGray);
 		    c.drawString ("" + Math.round (destroyedChars / 5.0 / (new Date ().getTime () - time) * 60000), 573, 430);      //Calculate and print wpm
 		    input.close ();
+		    originalText = "";
+		    input = new BufferedReader (new FileReader ("characterFiles.ans"));           //Create a BufferedReader to search through the read file
+		    originalText += input.readLine ();      //Add the first character to originalText
+		    line = input.readLine ();                                //Read the second string in the file to see if there are any characters left
+		    if (errors > 50 && difficulty == 4)      //For time attack - shut down the game when the user makes 50 errors
+		    {
+			originalText = "";
+			input = new BufferedReader (new FileReader ("gameFiles.ans"));    //Encode and recreate gameFiles.ans, but add a 0 to the 7th line since we're shutting down the game.
+			for (int v = 0 ; v < 6 ; v++)
+			{
+			    originalText += input.readLine ();
+			    originalText += "/";
+			}
+			originalText += "0/";        //Add a 0 to signify shutting down the game.
+			input.close ();
+			output = new PrintWriter (new FileWriter ("gameFiles.ans"));
+			for (int v = 0 ; v < originalText.length () ; v++)  //Iterate through each character in originalText
+			{
+			    switch (originalText.charAt (v))
+			    {
+				case '/':                                       //If the loop finds a backslash, print a new line
+				    output.println ();
+				    break;
+				default:                                        //Otherwise, print the character that is in the text.
+				    output.print (originalText.charAt (v));
+
+			    }
+			}
+			output.close ();
+		    }
 		}
 		catch (Exception e)
 		{
